@@ -137,6 +137,17 @@
 - (void)mp_setDataSource:(id<UICollectionViewDataSource>)dataSource;
 
 /**
+ * Sets the collection view's prefetch data source.
+ *
+ * If your application needs to change a collection view's prefetch data source after it has instantiated an
+ * ad placer using that collection view, use this method rather than
+ * -[UICollectionView setPrefetchDataSource:].
+ *
+ * @param dataSource The new collection view prefetch data source.
+ */
+- (void)mp_setPrefetchDataSource:(id<UICollectionViewDataSourcePrefetching>)prefetchDataSource;
+
+/**
  * Returns the original data source of the collection view.
  *
  * When you instantiate an ad placer using a collection view, the ad placer replaces the collection

@@ -19,11 +19,12 @@ static NSString * const kCollectionViewAdPlacerReuseIdentifier = @"MPCollectionV
 
 @protocol MPNativeAdRenderer;
 
-@interface MPCollectionViewAdPlacer () <UICollectionViewDataSource, UICollectionViewDelegate, MPStreamAdPlacerDelegate, UICollectionViewDelegateFlowLayout>
+@interface MPCollectionViewAdPlacer () <UICollectionViewDataSource, UICollectionViewDataSourcePrefetching, UICollectionViewDelegate, MPStreamAdPlacerDelegate, UICollectionViewDelegateFlowLayout>
 
 @property (nonatomic, strong) MPStreamAdPlacer *streamAdPlacer;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, weak) id<UICollectionViewDataSource> originalDataSource;
+@property (nonatomic, weak) id<UICollectionViewDataSourcePrefetching> originalPrefetchDataSource;
 @property (nonatomic, weak) id<UICollectionViewDelegate> originalDelegate;
 @property (nonatomic, strong) MPTimer *insertionTimer;
 
@@ -179,6 +180,31 @@ static NSString * const kCollectionViewAdPlacerReuseIdentifier = @"MPCollectionV
 
     NSIndexPath *originalIndexPath = [self.streamAdPlacer originalIndexPathForAdjustedIndexPath:indexPath];
     return [self.originalDataSource collectionView:collectionView cellForItemAtIndexPath:originalIndexPath];
+}
+
+#pragma mark - <UICollectionViewDataSourcePrefetching>
+-(void)collectionView:(UICollectionView *)collectionView prefetchItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
+{
+    NSMutableArray<NSIndexPath *> * originalIndexPaths = [[NSMutableArray alloc] init];
+    for(NSIndexPath* indexPath in indexPaths){
+        if (![self.streamAdPlacer isAdAtIndexPath:indexPath]) {
+            NSIndexPath *originalIndexPath = [self.streamAdPlacer originalIndexPathForAdjustedIndexPath:indexPath];
+            [originalIndexPaths addObject:originalIndexPath];
+        }
+    }
+    [self.originalPrefetchDataSource collectionView:collectionView prefetchItemsAtIndexPaths:originalIndexPaths];
+}
+
+-(void)collectionView:(UICollectionView *)collectionView cancelPrefetchingForItemsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
+{
+    NSMutableArray<NSIndexPath *> * originalIndexPaths = [[NSMutableArray alloc] init];
+    for(NSIndexPath* indexPath in indexPaths){
+        if (![self.streamAdPlacer isAdAtIndexPath:indexPath]) {
+            NSIndexPath *originalIndexPath = [self.streamAdPlacer originalIndexPathForAdjustedIndexPath:indexPath];
+            [originalIndexPaths addObject:originalIndexPath];
+        }
+    }
+    [self.originalPrefetchDataSource collectionView:collectionView cancelPrefetchingForItemsAtIndexPaths:originalIndexPaths];
 }
 
 #pragma mark - <UICollectionViewDelegate>
@@ -376,6 +402,17 @@ static char kAdPlacerKey;
         adPlacer.originalDataSource = dataSource;
     } else {
         self.dataSource = dataSource;
+    }
+}
+
+- (void)mp_setPrefetchDataSource:(id<UICollectionViewDataSourcePrefetching>)prefetchDataSource
+{
+    MPCollectionViewAdPlacer *adPlacer = [self mp_adPlacer];
+
+    if (adPlacer) {
+        adPlacer.originalPrefetchDataSource = prefetchDataSource;
+    } else {
+        self.prefetchDataSource = prefetchDataSource;
     }
 }
 
