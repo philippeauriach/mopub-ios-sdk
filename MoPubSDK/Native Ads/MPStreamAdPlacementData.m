@@ -323,7 +323,13 @@ static const NSUInteger kMaximumNumberOfAdsPerStream = 255;
     [self updateAllSectionsForPositioningArraysAtSection:newSection];
 }
 
+
 - (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths
+{
+    [self insertItemsAtIndexPaths:originalIndexPaths offsetAds:true];
+}
+
+- (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths offsetAds:(Boolean)offsetAds
 {
     originalIndexPaths = [originalIndexPaths sortedArrayUsingSelector:@selector(compare:)];
 
@@ -331,14 +337,16 @@ static const NSUInteger kMaximumNumberOfAdsPerStream = 255;
         NSMutableArray *desiredOriginalPositions = [self positioningArrayForSection:originalIndexPath.section inDictionary:self.desiredOriginalPositions];
         NSMutableArray *originalAdIndexPaths = [self positioningArrayForSection:originalIndexPath.section inDictionary:self.originalAdIndexPaths];
 
-        NSUInteger insertionIndex = [self indexOfIndexPath:originalIndexPath inSortedArray:desiredOriginalPositions options:NSBinarySearchingInsertionIndex | NSBinarySearchingFirstEqual];
-        for (NSUInteger i = insertionIndex; i < [desiredOriginalPositions count]; i++) {
-            [self incrementDesiredIndexPathsAtIndex:i inSection:originalIndexPath.section];
-        }
+        if(offsetAds) {
+            NSUInteger insertionIndex = [self indexOfIndexPath:originalIndexPath inSortedArray:desiredOriginalPositions options:NSBinarySearchingInsertionIndex | NSBinarySearchingFirstEqual];
+            for (NSUInteger i = insertionIndex; i < [desiredOriginalPositions count]; i++) {
+                [self incrementDesiredIndexPathsAtIndex:i inSection:originalIndexPath.section];
+            }
 
-        NSUInteger originalInsertionIndex = [self indexOfIndexPath:originalIndexPath inSortedArray:originalAdIndexPaths options:NSBinarySearchingInsertionIndex | NSBinarySearchingFirstEqual];
-        for (NSUInteger i = originalInsertionIndex; i < [originalAdIndexPaths count]; i++) {
-            [self incrementPlacedIndexPathsAtIndex:i inSection:originalIndexPath.section];
+            NSUInteger originalInsertionIndex = [self indexOfIndexPath:originalIndexPath inSortedArray:originalAdIndexPaths options:NSBinarySearchingInsertionIndex | NSBinarySearchingFirstEqual];
+            for (NSUInteger i = originalInsertionIndex; i < [originalAdIndexPaths count]; i++) {
+                [self incrementPlacedIndexPathsAtIndex:i inSection:originalIndexPath.section];
+            }
         }
     }];
 }
