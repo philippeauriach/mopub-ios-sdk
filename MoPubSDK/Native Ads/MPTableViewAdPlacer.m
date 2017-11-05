@@ -560,7 +560,7 @@ static char kAdPlacerKey;
     }
 }
 
-- (id<UITableViewDataSource>)mp_prefetchDataSource
+- (id<UITableViewDataSourcePrefetching>)mp_prefetchDataSource
 {
     MPTableViewAdPlacer *adPlacer = [self mp_adPlacer];
 
