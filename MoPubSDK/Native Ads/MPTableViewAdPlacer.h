@@ -167,7 +167,7 @@
  *
  * @return The original table view prefetch data source.
  */
-- (id<UITableViewDataSource>)mp_prefetchDataSource;
+- (id<UITableViewDataSourcePrefetching>)mp_prefetchDataSource;
 
 /**
  * Sets the table view's delegate.
