@@ -188,6 +188,16 @@
 - (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths;
 
 /**
+ * Tells the ad placer that content items have been inserted at the specified index paths.
+ *
+ * This method allows the ad placer to adjust its ad positions correctly.
+ *
+ * @param originalIndexPaths An array of NSIndexPath objects that identify positions where content
+ * @param offsetAds : if true, ad placer will offset ads, otherwise it wont
+ * has been inserted.
+ */
+- (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths offsetAds:(Boolean)offsetAds;
+/**
  * Tells the ad placer that content items have been deleted at the specified index paths.
  *
  * This method allows the ad placer to adjust its ad positions correctly, and remove from the

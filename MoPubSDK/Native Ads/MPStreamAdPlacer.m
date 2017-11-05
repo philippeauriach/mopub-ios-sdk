@@ -238,7 +238,12 @@ static const NSUInteger kIndexPathItemIndex = 1;
 
 - (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths
 {
-    [self.adPlacementData insertItemsAtIndexPaths:originalIndexPaths];
+    [self insertItemsAtIndexPaths:originalIndexPaths offsetAds:true];
+}
+
+- (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths offsetAds:(Boolean)offsetAds
+{
+    [self.adPlacementData insertItemsAtIndexPaths:originalIndexPaths offsetAds:offsetAds];
     [originalIndexPaths enumerateObjectsUsingBlock:^(NSIndexPath *originalIndexPath, NSUInteger idx, BOOL *stop) {
         NSInteger section = originalIndexPath.section;
         [self setItemCount:[[self.sectionCounts objectForKey:@(section)] integerValue] + 1 forSection:section];

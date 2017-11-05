@@ -621,11 +621,16 @@ static char kAdPlacerKey;
 
 - (void)mp_insertItemsAtIndexPaths:(NSArray *)indexPaths
 {
+    [self mp_insertItemsAtIndexPaths:indexPaths offsetAds:true];
+}
+
+- (void)mp_insertItemsAtIndexPaths:(NSArray *)indexPaths offsetAds:(Boolean)offsetAds
+{
     MPCollectionViewAdPlacer *adPlacer = [self mp_adPlacer];
     NSArray *adjustedIndexPaths = indexPaths;
 
     if (adPlacer) {
-        [adPlacer.streamAdPlacer insertItemsAtIndexPaths:indexPaths];
+        [adPlacer.streamAdPlacer insertItemsAtIndexPaths:indexPaths offsetAds:offsetAds];
         adjustedIndexPaths = [adPlacer.streamAdPlacer adjustedIndexPathsForOriginalIndexPaths:indexPaths];
     }
 

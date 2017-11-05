@@ -196,6 +196,16 @@
 - (void)mp_insertItemsAtIndexPaths:(NSArray *)indexPaths;
 
 /**
+ * Inserts new items at the specified index paths, and informs the attached ad placer of the
+ * insertions.
+ *
+ * @param indexPaths An array of `NSIndexPath` objects, each of which contains a section index and
+ * @param offsetAds If true, ads will be offseted when items are inserted. Otherwise, ads wont  move.
+ * item index at which to insert a new cell. This parameter must not be `nil`.
+ */
+- (void)mp_insertItemsAtIndexPaths:(NSArray *)indexPaths offsetAds:(Boolean)offsetAds;
+
+/**
  * Deletes the items at the specified index paths, and informs the attached ad placer of the
  * deletions.
  *

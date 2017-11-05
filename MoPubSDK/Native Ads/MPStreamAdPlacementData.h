@@ -29,6 +29,7 @@
 - (void)deleteSections:(NSIndexSet *)sections;
 - (void)moveSection:(NSInteger)section toSection:(NSInteger)newSection;
 - (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths;
+- (void)insertItemsAtIndexPaths:(NSArray *)originalIndexPaths offsetAds:(Boolean)offsetAds;
 - (void)deleteItemsAtIndexPaths:(NSArray *)originalIndexPaths;
 - (void)moveItemAtIndexPath:(NSIndexPath *)originalIndexPath toIndexPath:(NSIndexPath *)newIndexPath;
 

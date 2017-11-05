@@ -730,11 +730,16 @@ static char kAdPlacerKey;
 
 - (void)mp_insertRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation
 {
+    [self mp_insertRowsAtIndexPaths:indexPaths withRowAnimation:animation offsetAds:true];
+}
+
+- (void)mp_insertRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation offsetAds:(Boolean)offsetAds
+{
     MPTableViewAdPlacer *adPlacer = [self mp_adPlacer];
     NSArray *adjustedIndexPaths = indexPaths;
 
     if (adPlacer) {
-        [adPlacer.streamAdPlacer insertItemsAtIndexPaths:indexPaths];
+        [adPlacer.streamAdPlacer insertItemsAtIndexPaths:indexPaths offsetAds:offsetAds];
         adjustedIndexPaths = [adPlacer.streamAdPlacer adjustedIndexPathsForOriginalIndexPaths:indexPaths];
     }
 
