@@ -19,11 +19,12 @@
 
 static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlacerReuseIdentifier";
 
-@interface MPTableViewAdPlacer () <UITableViewDataSource, UITableViewDelegate, MPStreamAdPlacerDelegate>
+@interface MPTableViewAdPlacer () <UITableViewDataSource, UITableViewDataSourcePrefetching, UITableViewDelegate, MPStreamAdPlacerDelegate>
 
 @property (nonatomic, strong) MPStreamAdPlacer *streamAdPlacer;
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, weak) id<UITableViewDataSource> originalDataSource;
+@property (nonatomic, weak) id<UITableViewDataSourcePrefetching> originalPrefetchDataSource;
 @property (nonatomic, weak) id<UITableViewDelegate> originalDelegate;
 @property (nonatomic, strong) MPTimer *insertionTimer;
 
@@ -56,6 +57,7 @@ static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlace
         _streamAdPlacer.delegate = self;
 
         _originalDataSource = tableView.dataSource;
+        _originalPrefetchDataSource = tableView.prefetchDataSource;
         _originalDelegate = tableView.delegate;
         tableView.dataSource = self;
         tableView.delegate = self;
@@ -220,6 +222,32 @@ static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlace
         NSIndexPath *origDestination = [self.streamAdPlacer originalIndexPathForAdjustedIndexPath:destinationIndexPath];
         [dataSource tableView:tableView moveRowAtIndexPath:origSource toIndexPath:origDestination];
     }
+}
+
+#pragma mark - <UITableViewDataSourcePrefetching>
+
+-(void)tableView:(UITableView *)tableView prefetchRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
+{
+    NSMutableArray<NSIndexPath *> * originalIndexPaths = [[NSMutableArray alloc] init];
+    for(NSIndexPath* indexPath in indexPaths){
+        if (![self.streamAdPlacer isAdAtIndexPath:indexPath]) {
+            NSIndexPath *originalIndexPath = [self.streamAdPlacer originalIndexPathForAdjustedIndexPath:indexPath];
+            [originalIndexPaths addObject:originalIndexPath];
+        }
+    }
+    [self.originalPrefetchDataSource tableView:tableView prefetchRowsAtIndexPaths:originalIndexPaths];
+}
+
+-(void)tableView:(UITableView *)tableView cancelPrefetchingForRowsAtIndexPaths:(NSArray<NSIndexPath *> *)indexPaths
+{
+    NSMutableArray<NSIndexPath *> * originalIndexPaths = [[NSMutableArray alloc] init];
+    for(NSIndexPath* indexPath in indexPaths){
+        if (![self.streamAdPlacer isAdAtIndexPath:indexPath]) {
+            NSIndexPath *originalIndexPath = [self.streamAdPlacer originalIndexPathForAdjustedIndexPath:indexPath];
+            [originalIndexPaths addObject:originalIndexPath];
+        }
+    }
+    [self.originalPrefetchDataSource tableView:tableView cancelPrefetchingForRowsAtIndexPaths:originalIndexPaths];
 }
 
 #pragma mark - <UITableViewDelegate>
@@ -426,6 +454,7 @@ static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlace
 - (BOOL)isKindOfClass:(Class)aClass {
     return [super isKindOfClass:aClass] ||
     [self.originalDataSource isKindOfClass:aClass] ||
+    [self.originalPrefetchDataSource isKindOfClass:aClass] ||
     [self.originalDelegate isKindOfClass:aClass];
 }
 
@@ -433,13 +462,15 @@ static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlace
 {
     return [super conformsToProtocol:aProtocol] ||
     [self.originalDelegate conformsToProtocol:aProtocol] ||
-    [self.originalDataSource conformsToProtocol:aProtocol];
+    [self.originalDataSource conformsToProtocol:aProtocol] ||
+    [self.originalPrefetchDataSource conformsToProtocol:aProtocol];
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
     return [super respondsToSelector:aSelector] ||
     [self.originalDataSource respondsToSelector:aSelector] ||
+    [self.originalPrefetchDataSource respondsToSelector:aSelector] ||
     [self.originalDelegate respondsToSelector:aSelector];
 }
 
@@ -447,6 +478,8 @@ static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlace
 {
     if ([self.originalDataSource respondsToSelector:aSelector]) {
         return self.originalDataSource;
+    } else if ([self.originalPrefetchDataSource respondsToSelector:aSelector]) {
+        return self.originalPrefetchDataSource;
     } else if ([self.originalDelegate respondsToSelector:aSelector]) {
         return self.originalDelegate;
     } else {
@@ -513,6 +546,28 @@ static char kAdPlacerKey;
         return adPlacer.originalDataSource;
     } else {
         return self.dataSource;
+    }
+}
+
+- (void)mp_setPrefetchDataSource:(id<UITableViewDataSourcePrefetching>)prefetchDataSource
+{
+    MPTableViewAdPlacer *adPlacer = [self mp_adPlacer];
+
+    if (adPlacer) {
+        adPlacer.originalPrefetchDataSource = prefetchDataSource;
+    } else {
+        self.prefetchDataSource = prefetchDataSource;
+    }
+}
+
+- (id<UITableViewDataSource>)mp_prefetchDataSource
+{
+    MPTableViewAdPlacer *adPlacer = [self mp_adPlacer];
+
+    if (adPlacer) {
+        return adPlacer.originalPrefetchDataSource;
+    } else {
+        return self.prefetchDataSource;
     }
 }
 

@@ -149,6 +149,27 @@
 - (id<UITableViewDataSource>)mp_dataSource;
 
 /**
+ * Sets the table view's prefetch data source.
+ *
+ * If your application needs to change a table view's prefetch data source after it has instantiated an ad
+ * placer using that table view, use this method rather than -[UITableView setPrefetchDataSource:].
+ *
+ * @param prefetchDataSource The new table view data source.
+ */
+- (void)mp_setPrefetchDataSource:(id<UITableViewDataSourcePrefetching>)prefetchDataSource;
+
+/**
+ * Returns the original prefetch data source of the table view.
+ *
+ * When you instantiate an ad placer using a table view, the ad placer replaces the table view's
+ * original prefetch data source object. If your application needs to access the original data source, use
+ * this method instead of -[UITableView prefetchDataSource].
+ *
+ * @return The original table view prefetch data source.
+ */
+- (id<UITableViewDataSource>)mp_prefetchDataSource;
+
+/**
  * Sets the table view's delegate.
  *
  * If your application needs to change a table view's delegate after it has instantiated an ad
