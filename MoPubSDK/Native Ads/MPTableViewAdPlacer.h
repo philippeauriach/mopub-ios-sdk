@@ -220,6 +220,8 @@
  */
 - (void)mp_insertRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation;
 
+- (void)mp_insertRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation offsetAds:(Boolean)offsetAds;
+
 /**
  * Deletes rows in the receiver at the locations identified by an array of index paths, and informs
  * the attached ad placer of the deletions.
