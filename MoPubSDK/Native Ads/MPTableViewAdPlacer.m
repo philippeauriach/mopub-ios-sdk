@@ -57,10 +57,14 @@ static NSString * const kTableViewAdPlacerReuseIdentifier = @"MPTableViewAdPlace
         _streamAdPlacer.delegate = self;
 
         _originalDataSource = tableView.dataSource;
-        _originalPrefetchDataSource = tableView.prefetchDataSource;
         _originalDelegate = tableView.delegate;
         tableView.dataSource = self;
         tableView.delegate = self;
+        
+        if (@available(iOS 10, *)) {
+            _originalPrefetchDataSource = tableView.prefetchDataSource;
+            tableView.prefetchDataSource = self;
+        }
 
         [self.tableView registerClass:[MPTableViewAdPlacerCell class] forCellReuseIdentifier:kTableViewAdPlacerReuseIdentifier];
 

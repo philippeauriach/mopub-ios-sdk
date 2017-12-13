@@ -61,11 +61,14 @@ static NSString * const kCollectionViewAdPlacerReuseIdentifier = @"MPCollectionV
         [_insertionTimer scheduleNow];
 
         _originalDataSource = collectionView.dataSource;
-        _originalPrefetchDataSource = collectionView.prefetchDataSource;
         _originalDelegate = collectionView.delegate;
         collectionView.dataSource = self;
-        collectionView.prefetchDataSource = self;
         collectionView.delegate = self;
+        
+        if (@available(iOS 10, *)) {
+            _originalPrefetchDataSource = collectionView.prefetchDataSource;
+            collectionView.prefetchDataSource = self;
+        }
 
         [_collectionView registerClass:[MPCollectionViewAdPlacerCell class] forCellWithReuseIdentifier:kCollectionViewAdPlacerReuseIdentifier];
 
